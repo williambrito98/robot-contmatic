@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
+import Schedule from "./components/Schedule";
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Login setToken={setToken} />} />
         <Route path='/admin' element={<Dashboard token={token} />} />
+        <Route path='/admin/schedule' element={<Schedule />} />
       </Routes>
     </Router>
   );
