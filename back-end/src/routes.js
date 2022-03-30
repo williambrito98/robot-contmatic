@@ -7,9 +7,14 @@ const { join } = require('path')
 const pathLogFile = join(__dirname, 'log', 'log.txt')
 const router = Router()
 
+
 const statusRobot = {
   status: 'parado'
 }
+
+router.get('/', (req, res) => {
+  return res.sendFile('index.html', { root: '../front-end/build' })
+})
 
 router.post('/api/login', async (req, res) => {
   try {
