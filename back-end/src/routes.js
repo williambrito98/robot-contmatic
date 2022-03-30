@@ -5,11 +5,12 @@ const { verifyJWT } = require('./utils/jwt')
 const { readFileSync, existsSync, appendFileSync, readdirSync, unlinkSync } = require('fs')
 const { join, resolve } = require('path')
 const { fork } = require('child_process')
+const multer = require('multer')
 const pathLogFile = join(__dirname, 'log', 'log.txt')
 const router = Router()
 const storage = require('./utils/upload');
 
-const upload = multer({ dest: 'uploads/', storage() });
+const upload = multer({ dest: 'uploads/', storage });
 
 const statusRobot = {
   status: 'parado'

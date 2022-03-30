@@ -13,6 +13,10 @@ const { existsSync, mkdirSync } = require('fs');
     mkdirSync(resolve('./uploads'))
   }
 
+  if (!existsSync(resolve('./log'))) {
+    mkdirSync(resolve('./log'))
+  }
+
   const app = express()
   app.use(cors())
   app.use(express.urlencoded())
