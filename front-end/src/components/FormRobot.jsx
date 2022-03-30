@@ -26,7 +26,7 @@ const FormRobot = ({ token }) => {
             method: 'post',
             body: JSON.stringify({
                 servidor: servidor,
-                codigos: codigosValues,
+                codigo: codigosValues,
                 anos: anosValues,
                 mes: mesesValues
             }),

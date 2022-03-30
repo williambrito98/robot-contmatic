@@ -51,7 +51,12 @@ router.post('/api/run', verifyJWT, async (req, res) => {
     statusRobot.status = 'rodando'
     const child = fork(process.env.PATH_ROBOT, ['child', JSON.stringify(req.body)])
     child.on('exit', () => {
-      statusWorker.status = 'Parado'
+      statusRobot.status = 'Parado'
+      unlinkSync(pathLogFile)
+    })
+
+    child.on('message', (message) => {
+      appendFileSync(pathLogFile, message)
     })
     return res.status(200).end()
   } catch (error) {
