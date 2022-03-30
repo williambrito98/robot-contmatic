@@ -1,12 +1,17 @@
 const { config } = require('dotenv')
 const express = require('express')
-const { join, parse } = require('path')
+const { join, parse, resolve } = require('path')
 const routes = require('./routes')
 const cors = require('cors');
+const { existsSync, mkdirSync } = require('fs');
 (async () => {
   config({
     path: join(parse(__dirname).dir, '.env')
   })
+
+  if (!existsSync(resolve('./uploads'))) {
+    mkdirSync(resolve('./uploads'))
+  }
 
   const app = express()
   app.use(cors())

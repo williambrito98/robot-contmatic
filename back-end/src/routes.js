@@ -2,11 +2,14 @@ const { Router } = require('express')
 const connection = require('./database/connection')
 const { sign } = require('jsonwebtoken')
 const { verifyJWT } = require('./utils/jwt')
-const { readFileSync, existsSync, appendFileSync } = require('fs')
-const { join } = require('path')
+const { readFileSync, existsSync, appendFileSync, readdirSync, unlinkSync } = require('fs')
+const { join, resolve } = require('path')
+const { fork } = require('child_process')
 const pathLogFile = join(__dirname, 'log', 'log.txt')
 const router = Router()
+const storage = require('./utils/upload');
 
+const upload = multer({ dest: 'uploads/', storage() });
 
 const statusRobot = {
   status: 'parado'
@@ -41,7 +44,14 @@ router.post('/api/run', verifyJWT, async (req, res) => {
     if (statusRobot.status !== 'parado') {
       return res.send({ message: 'Já existe uma instancia do robo rodando' }).end()
     }
+    const file = readdirSync(resolve('./uploads')).pop()
+    file ? unlinkSync(resolve('./uploads', file)) : ''
+
     statusRobot.status = 'rodando'
+    const child = fork(process.env.PATH_ROBOT, ['child', JSON.stringify(req.body)])
+    child.on('exit', () => {
+      statusWorker.status = 'Parado'
+    })
     return res.status(200).end()
   } catch (error) {
     console.log(error)
@@ -130,5 +140,19 @@ router.post('/api/schedule/remove', verifyJWT, async (req, res) => {
     return res.status(500).end()
   }
 })
+
+router.get('/downloadZip', function (req, res) {
+  const file = readdirSync(resolve('./uploads')).pop()
+  if (file) {
+    return res.download(resolve('./uploads', file));
+  }
+  return res.end();
+
+});
+
+router.post('/uploadZip', upload.single('zip'), (req, res) => {
+  return res.sendStatus(200)
+})
+
 
 module.exports = router
