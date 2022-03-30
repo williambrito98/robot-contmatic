@@ -24,7 +24,7 @@ const Login = ({ setToken }) => {
         }).then(json => {
             json.json().then(res => {
                 if (!res.auth) {
-                    return alert('Usuario ou senha incorreto')
+                    return alert(res.message)
                 }
                 setToken(() => {
                     return res.token

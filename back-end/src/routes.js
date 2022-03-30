@@ -13,14 +13,18 @@ const statusRobot = {
 
 router.post('/api/login', async (req, res) => {
   try {
+    if (!req.body.email || !req.body.password) {
+      return res.send({ message: 'Usuario ou senha incorreto' }).end()
+    }
     const conn = connection()
     const user = await conn.withSchema(process.env.DB_SCHEMA).table('users').where({ email: req.body.email, password: req.body.password }).first()
-    if (user) {
+    if (Object.keys(user).length !== 0) {
       const token = sign({ userID: user.id }, process.env.SECRET_API, { expiresIn: 500 })
-      return res.status(200).json({ auth: true, token })
+      return res.status(200).json({ token, auth: true })
     }
+
     await conn.destroy()
-    return res.send({ message: 'Usuario ou senha incorreto', auth: false }).end()
+    return res.send({ message: 'Usuario ou senha incorreto' }).end()
   } catch (error) {
     console.log(error)
     return res.status(500).end()
@@ -85,6 +89,7 @@ router.post('/api/schedule', verifyJWT, async (req, res) => {
       anos: req.body.anos.join(','),
       meses: req.body.meses.join(',')
     })
+    await conn.destroy()
     return res.send(200).end()
   } catch (error) {
     console.log(error)
@@ -113,6 +118,7 @@ router.post('/api/schedule/remove', verifyJWT, async (req, res) => {
   try {
     const conn = connection()
     await conn.withSchema(process.env.DB_SCHEMA).table('schedule').where({ id: req.body.id }).delete()
+    await conn.destroy()
     return res.send({ message: 'agendamento excluido com sucesso' }).end()
   } catch (error) {
     console.log(error)
